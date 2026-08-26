@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name        Dakuten ⭐
 // @namespace        http://tampermonkey.net/
-// @version        0.5
+// @version        0.6
 // @description        編集枠（通常表示）で濁点・半濁点のチェック　「F10」ダブルキー押下
 // @author        Ameba Blog User
-// @match        https://blog.ameba.jp/ucs/entry/srventry*
-// @exclude        https://blog.ameba.jp/ucs/entry/srventrylist.do*
+// @match        https://blog.ameba.jp/ucs/entry/srventryinsertinput.do*
+// @match        https://blog.ameba.jp/ucs/entry/srventryupdateinput.do*
 // @icon        https://www.google.com/s2/favicons?sz=64&domain=ameba.jp
 // @grant        none
 // @updateURL        https://github.com/personwritep/Dakuten/raw/main/Dakuten.user.js
