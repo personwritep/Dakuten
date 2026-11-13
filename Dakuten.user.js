@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Dakuten ⭐
 // @namespace        http://tampermonkey.net/
-// @version        0.6
+// @version        0.7
 // @description        編集枠（通常表示）で濁点・半濁点のチェック　「F10」ダブルキー押下
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/entry/srventryinsertinput.do*
@@ -12,6 +12,10 @@
 // @downloadURL        https://github.com/personwritep/Dakuten/raw/main/Dakuten.user.js
 // ==/UserScript==
 
+
+let listen=Symbol();
+let listenK=Symbol();
+let listenE=Symbol();
 
 
 let ud_mode; // アンダーライン表示・非表示
@@ -55,15 +59,17 @@ function main(){
     catch_key();
 
     function catch_key(){
-        document.onkeydown=function(event){
-            check_key(event); }
+        if(!document[listen]){
+            document.addEventListener("keydown", check_key);
+            document[listen]=true; }
 
         editor_iframe=document.querySelector('.cke_wysiwyg_frame');
         if(editor_iframe){
             iframe_doc=editor_iframe.contentWindow.document;
             if(iframe_doc){
-                iframe_doc.onkeydown=function(event){
-                    check_key(event); }}}
+                if(!iframe_doc[listen]){
+                    iframe_doc.addEventListener("keydown", check_key);
+                    iframe_doc[listen]=true; }}}
 
 
         let clickCount=0;
@@ -246,15 +252,23 @@ function main(){
         try{
             mark[hk].classList.add("h"); } // 最初のハイライト色を変更
         catch(e){ ; }
-
         result_box.textContent=count_t+'│'+(hk+1);
 
-        document.addEventListener("keydown", check_arrow); // documentは先に指定
+        if(!document[listenK]){
+            document.addEventListener("keydown", check_arrow); // documentは先に指定
+            document[listenK]=true; }
         iframe_doc=editor_iframe.contentWindow.document;
         if(iframe_doc){
-            iframe_doc.addEventListener("keydown", check_arrow); }// iframeは後に指定
+            if(!iframe_doc[listenK]){
+                iframe_doc.addEventListener("keydown", check_arrow);
+                iframe_doc[listenK]=true; }}// iframeは後に指定
 
         function check_arrow(event){
+            let mark=iframe_body.querySelectorAll('md');
+            for(let k=0; k<mark.length; k++){
+                if(mark[k].classList.contains('h')){
+                    hk=k; }}
+
             if(ud_mode==1){
                 if(event.keyCode==38 && act_mode==1){ //「⇧」
                     event.preventDefault();
@@ -360,8 +374,12 @@ function main(){
     function before_end(){
         editor_iframe=document.querySelector('.cke_wysiwyg_frame');
         let submitButton=document.querySelectorAll('.js-submitButton');
-        submitButton[0].addEventListener("mousedown", all_clear, false);
-        submitButton[1].addEventListener("mousedown", all_clear, false);
+        if(!submitButton[0][listenE]){
+            submitButton[0].addEventListener("mousedown", all_clear, false);
+            submitButton[0][listenE]=true; }
+        if(!submitButton[1][listenE]){
+            submitButton[1].addEventListener("mousedown", all_clear, false);
+            submitButton[1][listenE]=true; }
 
         function all_clear(){
             if(!editor_iframe){ //「HTML表示」編集画面の場合
